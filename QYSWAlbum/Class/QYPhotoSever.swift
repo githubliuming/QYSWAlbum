@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 import Photos
 class QYPhotoSever: NSObject {
 
@@ -87,10 +88,19 @@ class QYPhotoSever: NSObject {
                     }
                 })
             }
-            result(groups);
+            self.runOnMainThread {
+                result(groups);
+            }
         };
     }
-    open func fetchCollection(collection:PHAssetCollection?,option:PHFetchOptions) -> Array<QYAsset>
+
+    /// 遍历指定的相册
+    ///
+    /// - Parameters:
+    ///   - collection: 相册对象
+    ///   - option: 可选参数
+    /// - Returns: 返回遍历集合
+    open func fetchCollection(collection:PHAssetCollection?,option:PHFetchOptions?) -> Array<QYAsset>
     {
         guard let _:PHAssetCollection = collection else{
             print("collection 对象为空");
@@ -98,12 +108,79 @@ class QYPhotoSever: NSObject {
         }
         var assetModels:[QYAsset] = Array<QYAsset>();
         let assets:PHFetchResult = PHAsset.fetchAssets(in: collection!, options: option);
-        assets .enumerateObjects { (asset, idx, stop) in
-            let assetModel:QYAsset  = QYAsset(asset: asset);
-            assetModels.append(assetModel);
-        };
+        if assets.count > 0
+        {
+            assets .enumerateObjects { (asset, idx, stop) in
+                let assetModel:QYAsset  = QYAsset(asset: asset);
+                assetModels.append(assetModel);
+            };
+        }
         return assetModels;
     }
+    open func fetchCamerollCollection(type:QYPhotoLibarayAssertType,
+                                      block:@escaping(_:Array<QYGroup>) ->Void) ->Void{
+
+        self.photoQueue.addOperation{
+         
+            let camerollAlbum:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil);
+            
+            var groups:[QYGroup] = Array<QYGroup>();
+            camerollAlbum .enumerateObjects { (obj, idx, stop) in
+                
+                if obj.assetCollectionSubtype == .smartAlbumUserLibrary
+                {
+                    let option = self.getFetchOption(type: type);
+                    let assetModel:[QYAsset] = self.fetchCollection(collection: obj, option: option);
+                    let group:QYGroup = QYGroup.init(collection: obj, assetModels: assetModel);
+                    groups.append(group);
+                }
+            };
+            self.runOnMainThread {
+                
+                block(groups);
+            }
+        }
+    }
+    
+    open func requestOriginImage(option:PHImageRequestOptions?,
+                                 asset:QYAsset,
+                                 completedHander:QYPhotoSuccess?,
+                                 progress:QYPhotoSuccess?)->PHImageRequestID{
+     
+        return PHCachingImageManager.default().requestImageData(for: asset.phAsset, options: option, resultHandler: { (imageDate, dataUTI, orientation ,info) in
+           
+            let downFinish = info![PHImageCancelledKey] as! Bool;
+            if downFinish
+            {
+                if let completedBlcok:QYPhotoSuccess = completedHander
+                {
+                    completedBlcok(UIImage.init(data: imageDate!));
+                }
+            }
+            else
+            {
+                
+            }
+        });
+    }
+}
+extension QYPhotoSever
+{
+    /// 获取所有的相册
+    ///
+    /// - Returns: 相机集合
+    private func getAlubms()->Array<PHFetchResult<PHAssetCollection>>
+    {
+        //         智能相册
+        let smartAlbums:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil);
+        //        我的照片流 1.6.10重新加入..
+        let  myPhotoStreamAlbum:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype:.albumMyPhotoStream, options: nil);
+        
+        let importAlbum:PHFetchResult = PHAssetCollection.fetchAssetCollections(with:.album, subtype: .albumSyncedAlbum, options: nil);
+        //        let topLevelUserCollections:PHFetchResult = PHCollectionList.fetchTopLevelUserCollections(with: nil);
+        return [smartAlbums ,myPhotoStreamAlbum,importAlbum];
+    }
+    
     private func getFetchOption(type:QYPhotoLibarayAssertType) ->PHFetchOptions
     {
         
@@ -115,11 +192,11 @@ class QYPhotoSever: NSObject {
                 argumentArray: [PHAssetMediaType.image,PHAssetMediaType.video]
             );
         case.Photos:
-        options.predicate = NSPredicate(format: "mediaType = %d", argumentArray: [PHAssetMediaType.image]);
+            options.predicate = NSPredicate(format: "mediaType = %d", argumentArray: [PHAssetMediaType.image]);
         case .LivePhotoAndVideos:
             if #available(iOS 9.1, *)
             {
-                 options.predicate = NSPredicate(format:"(mediaType = %d and mediaSubtype == %d) or mediaType = %d ", argumentArray: [PHAssetMediaType.image,PHAssetMediaSubtype.photoLive,PHAssetMediaType.video]);
+                options.predicate = NSPredicate(format:"(mediaType = %d and mediaSubtype == %d) or mediaType = %d ", argumentArray: [PHAssetMediaType.image,PHAssetMediaSubtype.photoLive,PHAssetMediaType.video]);
             }
             else
             {
@@ -148,15 +225,18 @@ class QYPhotoSever: NSObject {
         
         return options;
     }
-    private func getAlubms()->Array<PHFetchResult<PHAssetCollection>>
-    { 
-//         智能相册
-        let smartAlbums:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil);
-//        我的照片流 1.6.10重新加入..
-        let  myPhotoStreamAlbum:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype:.albumMyPhotoStream, options: nil);
-        
-        let importAlbum:PHFetchResult = PHAssetCollection.fetchAssetCollections(with:.album, subtype: .albumSyncedAlbum, options: nil);
-//        let topLevelUserCollections:PHFetchResult = PHCollectionList.fetchTopLevelUserCollections(with: nil);
-        return [smartAlbums ,myPhotoStreamAlbum,importAlbum];
+    
+    private func runOnMainThread(block:@escaping()->Void)->Void
+    {
+        if Thread.isMainThread {
+            
+            block();
+        }
+        else
+        {
+            DispatchQueue.main.async {
+                block();
+            }
+        }
     }
 }

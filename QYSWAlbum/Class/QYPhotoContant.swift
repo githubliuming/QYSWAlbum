@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 public enum QYPhotoLibarayAssertType : Int
 {
     case All   //相册所有元素
@@ -17,3 +17,7 @@ public enum QYPhotoLibarayAssertType : Int
     case LivePhoto  // livePhoto
     case LivePhotoAndVideos  // livePhoto和视频
 }
+
+public typealias QYPhotoProgress = (Double,Error?)->Void
+public typealias QYPhotoError = (Error?)->Void
+public typealias QYPhotoSuccess = (UIImage?) ->Void
