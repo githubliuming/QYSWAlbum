@@ -16,6 +16,12 @@
 		8A33C3912056592200943ECF /* QYGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A33C3902056592200943ECF /* QYGroup.swift */; };
 		8A33C39320565A9100943ECF /* QYPhotoSever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A33C39220565A9100943ECF /* QYPhotoSever.swift */; };
 		8A33C39720566A7300943ECF /* QYPhotoContant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A33C39620566A7300943ECF /* QYPhotoContant.swift */; };
+		8AEBF04720FC4B42006ADF7D /* QYAlbumGroupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEBF04620FC4B42006ADF7D /* QYAlbumGroupCell.swift */; };
+		8AEBF04920FC4E73006ADF7D /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEBF04820FC4E73006ADF7D /* UIViewExtension.swift */; };
+		8AEBF04B20FC6F83006ADF7D /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEBF04A20FC6F83006ADF7D /* StringExtension.swift */; };
+		8AEBF04D20FC7B64006ADF7D /* GroupListViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEBF04C20FC7B64006ADF7D /* GroupListViewVC.swift */; };
+		8AEBF04F20FC89B7006ADF7D /* QYAssetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEBF04E20FC89B7006ADF7D /* QYAssetCell.swift */; };
+		8AEBF05320FC9BC7006ADF7D /* QYPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEBF05220FC9BC7006ADF7D /* QYPreviewVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +36,12 @@
 		8A33C3902056592200943ECF /* QYGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYGroup.swift; sourceTree = "<group>"; };
 		8A33C39220565A9100943ECF /* QYPhotoSever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYPhotoSever.swift; sourceTree = "<group>"; };
 		8A33C39620566A7300943ECF /* QYPhotoContant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYPhotoContant.swift; sourceTree = "<group>"; };
+		8AEBF04620FC4B42006ADF7D /* QYAlbumGroupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYAlbumGroupCell.swift; sourceTree = "<group>"; };
+		8AEBF04820FC4E73006ADF7D /* UIViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
+		8AEBF04A20FC6F83006ADF7D /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
+		8AEBF04C20FC7B64006ADF7D /* GroupListViewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListViewVC.swift; sourceTree = "<group>"; };
+		8AEBF04E20FC89B7006ADF7D /* QYAssetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYAssetCell.swift; sourceTree = "<group>"; };
+		8AEBF05220FC9BC7006ADF7D /* QYPreviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYPreviewVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,9 +74,10 @@
 		8A33C37A2056587200943ECF /* QYSWAlbum */ = {
 			isa = PBXGroup;
 			children = (
+				8AEBF05120FC8EDA006ADF7D /* view */,
+				8AEBF05020FC8EC5006ADF7D /* controller */,
 				8A33C38D2056589000943ECF /* Class */,
 				8A33C37B2056587200943ECF /* AppDelegate.swift */,
-				8A33C37D2056587200943ECF /* ViewController.swift */,
 				8A33C37F2056587200943ECF /* Main.storyboard */,
 				8A33C3822056587200943ECF /* Assets.xcassets */,
 				8A33C3842056587200943ECF /* LaunchScreen.storyboard */,
@@ -77,11 +90,32 @@
 			isa = PBXGroup;
 			children = (
 				8A33C38E205658D700943ECF /* QYAsset.swift */,
+				8AEBF04820FC4E73006ADF7D /* UIViewExtension.swift */,
+				8AEBF04A20FC6F83006ADF7D /* StringExtension.swift */,
 				8A33C3902056592200943ECF /* QYGroup.swift */,
 				8A33C39220565A9100943ECF /* QYPhotoSever.swift */,
 				8A33C39620566A7300943ECF /* QYPhotoContant.swift */,
 			);
 			path = Class;
+			sourceTree = "<group>";
+		};
+		8AEBF05020FC8EC5006ADF7D /* controller */ = {
+			isa = PBXGroup;
+			children = (
+				8A33C37D2056587200943ECF /* ViewController.swift */,
+				8AEBF04C20FC7B64006ADF7D /* GroupListViewVC.swift */,
+				8AEBF05220FC9BC7006ADF7D /* QYPreviewVC.swift */,
+			);
+			path = controller;
+			sourceTree = "<group>";
+		};
+		8AEBF05120FC8EDA006ADF7D /* view */ = {
+			isa = PBXGroup;
+			children = (
+				8AEBF04620FC4B42006ADF7D /* QYAlbumGroupCell.swift */,
+				8AEBF04E20FC89B7006ADF7D /* QYAssetCell.swift */,
+			);
+			path = view;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -116,7 +150,7 @@
 				TargetAttributes = {
 					8A33C3772056587200943ECF = {
 						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -157,11 +191,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A33C39720566A7300943ECF /* QYPhotoContant.swift in Sources */,
+				8AEBF05320FC9BC7006ADF7D /* QYPreviewVC.swift in Sources */,
 				8A33C39320565A9100943ECF /* QYPhotoSever.swift in Sources */,
 				8A33C37E2056587200943ECF /* ViewController.swift in Sources */,
 				8A33C38F205658D700943ECF /* QYAsset.swift in Sources */,
 				8A33C37C2056587200943ECF /* AppDelegate.swift in Sources */,
+				8AEBF04B20FC6F83006ADF7D /* StringExtension.swift in Sources */,
+				8AEBF04720FC4B42006ADF7D /* QYAlbumGroupCell.swift in Sources */,
+				8AEBF04F20FC89B7006ADF7D /* QYAssetCell.swift in Sources */,
+				8AEBF04920FC4E73006ADF7D /* UIViewExtension.swift in Sources */,
 				8A33C3912056592200943ECF /* QYGroup.swift in Sources */,
+				8AEBF04D20FC7B64006ADF7D /* GroupListViewVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,13 +338,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WJYBVW342N;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = FJV2B9GPDW;
 				INFOPLIST_FILE = QYSWAlbum/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.catch.QYSWAlbum;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoyoshijie.philm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "3aeacfd8-cfac-4028-a7e1-75912749ac2d";
+				PROVISIONING_PROFILE_SPECIFIER = com.yoyoshijie.philm.beta;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -314,13 +356,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WJYBVW342N;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = FJV2B9GPDW;
 				INFOPLIST_FILE = QYSWAlbum/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.catch.QYSWAlbum;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoyoshijie.philm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "3aeacfd8-cfac-4028-a7e1-75912749ac2d";
+				PROVISIONING_PROFILE_SPECIFIER = com.yoyoshijie.philm.beta;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

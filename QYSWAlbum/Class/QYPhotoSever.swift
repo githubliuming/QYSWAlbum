@@ -5,7 +5,13 @@
 //  Created by liuming on 2018/3/12.
 //  Copyright © 2018年 yoyo. All rights reserved.
 //
-
+/*
+1、遍历相册中所有的元素。
+2、遍历指定相册中的元素。
+3、获取相册图片的原图,支持icloud下载
+4、获取相册中的原始视频，支持将livephoto转换成视频
+6、获取相册缩略图
+ */
 import UIKit
 import Foundation
 import Photos
@@ -66,7 +72,7 @@ class QYPhotoSever: NSObject {
                         print("没有数据抛弃掉 \(obj.localizedTitle!)")
                         return ;
                     }
-                    guard let _ :String = obj.localizedTitle else{
+                     if obj.localizedTitle?.isEmpty == true {
                         print("标题为空 抛弃掉数据");
                         return ;
                     }
@@ -107,7 +113,7 @@ class QYPhotoSever: NSObject {
             return [];
         }
         var assetModels:[QYAsset] = Array<QYAsset>();
-        let assets:PHFetchResult = PHAsset.fetchAssets(in: collection!, options: option);
+        let assets:PHFetchResult = PHAsset.fetchAssets(in: collection!, options: nil);
         if assets.count > 0
         {
             assets .enumerateObjects { (asset, idx, stop) in
@@ -142,25 +148,82 @@ class QYPhotoSever: NSObject {
         }
     }
     
+    open func requestOriginImage(asset:QYAsset, completedHandler:QYPhotoSuccess?,
+                                 progress:QYPhotoProgress?) ->PHImageRequestID{
+        
+        return requestOriginImage(option: nil, asset: asset, completedHandler: completedHandler, progress: progress);
+    }
     open func requestOriginImage(option:PHImageRequestOptions?,
                                  asset:QYAsset,
-                                 completedHander:QYPhotoSuccess?,
-                                 progress:QYPhotoSuccess?)->PHImageRequestID{
-     
-        return PHCachingImageManager.default().requestImageData(for: asset.phAsset, options: option, resultHandler: { (imageDate, dataUTI, orientation ,info) in
-           
-            let downFinish = info![PHImageCancelledKey] as! Bool;
-            if downFinish
-            {
-                if let completedBlcok:QYPhotoSuccess = completedHander
-                {
-                    completedBlcok(UIImage.init(data: imageDate!));
-                }
-            }
-            else
-            {
+                                 completedHandler:QYPhotoSuccess?,
+                                 progress:QYPhotoProgress?)->PHImageRequestID{
+        
+        var tmpOption:PHImageRequestOptions? = PHImageRequestOptions.init();
+        tmpOption?.deliveryMode = .highQualityFormat;
+        tmpOption?.resizeMode = .exact;
+        tmpOption?.isNetworkAccessAllowed = true;
+        
+        if let _ = option{
+            tmpOption = option;
+        }
+        
+        tmpOption?.progressHandler = {(pro,error,stop,info) in
+            progress?(pro,error);
+        };
+        return PHCachingImageManager.default().requestImageData(for: asset.phAsset!, options: tmpOption, resultHandler: { (imageDate, dataUTI, orientation ,info) in
+            
+            let finished:Bool = self.getFinishState(info!);
+            if finished == true{
                 
+                guard let completed:QYPhotoSuccess = completedHandler else {
+                    
+                    return ;
+                }
+                let image:UIImage = UIImage.init(data: imageDate!)!;
+                self.runOnMainThread {
+                
+                    completed(image);
+                };
             }
+            
+        });
+    }
+    
+    open func requestThumbImage(asset:QYAsset,
+                                size:CGSize,
+                                completedHandler:QYPhotoSuccess?,progress:QYPhotoProgress?) ->PHImageRequestID{
+    
+        return requestThumImage(asset: asset,
+                                option: nil,
+                                size: size,
+                                completedHandler: completedHandler,
+                                progress: progress);
+    }
+    
+    open func requestThumImage(asset:QYAsset,option:PHImageRequestOptions?,size:CGSize, completedHandler:QYPhotoSuccess?,progress:QYPhotoProgress?)->PHImageRequestID{
+        
+        var tmpOptions = defautRequestImageOption();
+        if  let o:PHImageRequestOptions = option {
+            tmpOptions = o;
+        }
+        tmpOptions.progressHandler = {(pro,error,stop,info) in
+            progress?(pro,error);
+        };
+        
+        return  PHCachingImageManager.default().requestImage(for: asset.phAsset!, targetSize: size, contentMode: .aspectFill, options: tmpOptions, resultHandler: { (image, info) in
+            
+            guard let img:UIImage = image else{
+                
+                print("error get thumbImage faild");
+                return ;
+            }
+            
+            guard let _:QYPhotoSuccess = completedHandler  else {
+                
+                print(" completedHandler is nil");
+                return ;
+            }
+            completedHandler!(img);
         });
     }
 }
@@ -226,6 +289,15 @@ extension QYPhotoSever
         return options;
     }
     
+    private func defautRequestImageOption()->PHImageRequestOptions {
+        
+        let options:PHImageRequestOptions = PHImageRequestOptions.init();
+        options.resizeMode = .fast;
+        options.isNetworkAccessAllowed = true;
+        options.isSynchronous = false;
+        return options;
+    }
+    
     private func runOnMainThread(block:@escaping()->Void)->Void
     {
         if Thread.isMainThread {
@@ -238,5 +310,26 @@ extension QYPhotoSever
                 block();
             }
         }
+    }
+    private func getFinishState(_ info:Dictionary<AnyHashable, Any>) -> Bool{
+        
+        var isCancel = false;
+        var isError = false;
+        var isDegraded = false;
+        
+        if let cancel:NSNumber = info[PHImageCancelledKey] as? NSNumber {
+            isCancel = cancel.boolValue;
+        }
+        if let error:NSNumber =  info[PHImageErrorKey] as? NSNumber {
+            
+            isError = error.boolValue;
+        }
+        if let degraded:NSNumber = info[PHImageResultIsDegradedKey] as? NSNumber {
+            
+            isDegraded = degraded.boolValue;
+        }
+        
+       return !isCancel && !isError && !isDegraded;
+    
     }
 }

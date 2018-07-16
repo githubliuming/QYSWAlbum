@@ -18,6 +18,16 @@ public enum QYPhotoLibarayAssertType : Int
     case LivePhotoAndVideos  // livePhoto和视频
 }
 
+public enum QYPhotoAssetType:Int {
+    
+    case Unknown       //位置类型
+    case Image         //图片
+    case Gif           //gif
+    case Video         //视频
+    case livePhoto      //livePhoto
+    case HighFrameRate //慢动作视频
+    case Aduio         //音频
+}
 public typealias QYPhotoProgress = (Double,Error?)->Void
 public typealias QYPhotoError = (Error?)->Void
 public typealias QYPhotoSuccess = (UIImage?) ->Void
