@@ -12,7 +12,7 @@ open  class QYAsset:NSObject
 {
    public var phAsset:PHAsset?;
    public var medaiType:QYPhotoAssetType = .Unknown;
-    public init(asset:PHAsset)
+    public init(asset:PHAsset?)
     {
         super.init();
         self.phAsset = asset;
@@ -20,25 +20,27 @@ open  class QYAsset:NSObject
     }
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-
     }
     
-    private func transformAssetType(asset ast:PHAsset)-> QYPhotoAssetType{
+    private func transformAssetType(asset ast:PHAsset?)-> QYPhotoAssetType{
     
-        switch ast.mediaType {
+        guard let asset:PHAsset = ast else {
+            return QYPhotoAssetType.Unknown;
+        }
+        switch asset.mediaType {
         case .audio:
             return QYPhotoAssetType.Aduio;
         case .video:
-            if ast.mediaSubtypes == .videoHighFrameRate {
+            if asset.mediaSubtypes == .videoHighFrameRate {
              
                 return QYPhotoAssetType.HighFrameRate;
             }
             return QYPhotoAssetType.Video;
         case .image:
-            if ast.mediaSubtypes == .photoLive || Int(ast.mediaSubtypes.rawValue) == 10 {
+            if asset.mediaSubtypes == .photoLive || Int(asset.mediaSubtypes.rawValue) == 10 {
                 return QYPhotoAssetType.livePhoto;
             }
-            if (ast.value(forKey: "filename") as! String).hasSuffix("GIF"){
+            if (asset.value(forKey: "filename") as! String).hasSuffix("GIF"){
                 return QYPhotoAssetType.Gif;
             }
             return QYPhotoAssetType.Image

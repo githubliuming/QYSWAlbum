@@ -31,3 +31,5 @@ public enum QYPhotoAssetType:Int {
 public typealias QYPhotoProgress = (Double,Error?)->Void
 public typealias QYPhotoError = (Error?)->Void
 public typealias QYPhotoSuccess = (UIImage?) ->Void
+public typealias QYVideoSucces = (_ url:URL?) -> Void
+public typealias QYDeleteAssetCompletionBlock = (Bool,Error?)->Void
