@@ -6,18 +6,15 @@
 //  Copyright © 2018年 yoyo. All rights reserved.
 //
 
-import UIKit
 import Photos
-open class QYGroup:NSObject
-{
-    open var assets:[QYAsset];
-    open var phCollection:PHAssetCollection;
-    open var count:Int;
-    init(collection:PHAssetCollection,assetModels:[QYAsset])
-    {
-        assets = assetModels;
-        phCollection = collection;
-        count = assets.count;
+import UIKit
+open class QYGroup: NSObject {
+    open var assets: [QYAsset]
+    open var phCollection: PHAssetCollection
+    open var count: Int
+    init(collection: PHAssetCollection, assetModels: [QYAsset]) {
+        assets = assetModels
+        phCollection = collection
+        count = assets.count
     }
-
 }

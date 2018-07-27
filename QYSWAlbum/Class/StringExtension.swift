@@ -8,8 +8,7 @@
 
 import Foundation
 extension String {
-    
-    public static  func emptyString() -> String{
-        return "";
+    public static func emptyString() -> String {
+        return ""
     }
 }

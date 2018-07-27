@@ -6,46 +6,43 @@
 //  Copyright © 2018年 yoyo. All rights reserved.
 //
 
-import UIKit
 import Photos
-open  class QYAsset:NSObject
-{
-   public var phAsset:PHAsset?;
-   public var medaiType:QYPhotoAssetType = .Unknown;
-    public init(asset:PHAsset?)
-    {
-        super.init();
-        self.phAsset = asset;
-       self.medaiType = transformAssetType(asset: asset);
+import UIKit
+open class QYAsset: NSObject {
+    public var phAsset: PHAsset?
+    public var medaiType: QYPhotoAssetType = .Unknown
+    public init(asset: PHAsset?) {
+        super.init()
+        phAsset = asset
+        medaiType = transformAssetType(asset: asset)
     }
-    required public init?(coder aDecoder: NSCoder) {
+
+    public required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func transformAssetType(asset ast:PHAsset?)-> QYPhotoAssetType{
-    
-        guard let asset:PHAsset = ast else {
-            return QYPhotoAssetType.Unknown;
+
+    private func transformAssetType(asset ast: PHAsset?) -> QYPhotoAssetType {
+        guard let asset: PHAsset = ast else {
+            return QYPhotoAssetType.Unknown
         }
         switch asset.mediaType {
         case .audio:
-            return QYPhotoAssetType.Aduio;
+            return QYPhotoAssetType.Aduio
         case .video:
             if asset.mediaSubtypes == .videoHighFrameRate {
-             
-                return QYPhotoAssetType.HighFrameRate;
+                return QYPhotoAssetType.HighFrameRate
             }
-            return QYPhotoAssetType.Video;
+            return QYPhotoAssetType.Video
         case .image:
             if asset.mediaSubtypes == .photoLive || Int(asset.mediaSubtypes.rawValue) == 10 {
-                return QYPhotoAssetType.livePhoto;
+                return QYPhotoAssetType.livePhoto
             }
-            if (asset.value(forKey: "filename") as! String).hasSuffix("GIF"){
-                return QYPhotoAssetType.Gif;
+            if (asset.value(forKey: "filename") as! String).hasSuffix("GIF") {
+                return QYPhotoAssetType.Gif
             }
             return QYPhotoAssetType.Image
         default:
-           return QYPhotoAssetType.Unknown;
+            return QYPhotoAssetType.Unknown
         }
     }
 }
