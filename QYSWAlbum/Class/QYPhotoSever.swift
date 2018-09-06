@@ -15,7 +15,7 @@ import Photos
  6、获取相册缩略图
  */
 import UIKit
-class QYPhotoSever: NSObject {
+public class QYPhotoSever: NSObject {
     let photoQueue: OperationQueue = OperationQueue()
     public static let shareInstanced: QYPhotoSever = QYPhotoSever()
     private override init() {
