@@ -17,40 +17,40 @@ import Photos
 import UIKit
 class QYPhotoSever: NSObject {
     let photoQueue: OperationQueue = OperationQueue()
-    public static let shareInstanced: QYPhotoSever = QYPhotoSever.init()
+    public static let shareInstanced: QYPhotoSever = QYPhotoSever()
     private override init() {
         super.init()
         photoQueue.maxConcurrentOperationCount = 5
     }
-
+    
     // MARK: - 相册权限
-
+    
     /// 判断当前用户相册权限的状态
     ///
     /// - Returns: 当前用户的权限状态
     open class func albumPermissonStatues() -> PHAuthorizationStatus {
         return PHPhotoLibrary.authorizationStatus()
     }
-
+    
     /// 请求相册权限
     ///
     /// - Parameter gratend: 结果回调 YES - 有相册权限 NO --没有相册权限
     open class func requestAlbumAuthor(gratend: @escaping (_: Bool) -> Void) {
         PHPhotoLibrary.requestAuthorization { status in
-
+            
             gratend(status == PHAuthorizationStatus.authorized)
         }
     }
-
+    
     /// 判断用户是否有相册权限
     ///
     /// - Returns: true -有现相册权限 false - 没有相册权限
     open class func hasAlbumPermiss() -> Bool {
         return albumPermissonStatues() == .authorized
     }
-
+    
     // MARK: - 遍历相册
-
+    
     open func fetchAlbum(type: QYPhotoLibarayAssertType, result: @escaping (_: Array<QYGroup>) -> Void) {
         photoQueue.addOperation {
             let albums: Array = self.getAlubms()
@@ -89,7 +89,7 @@ class QYPhotoSever: NSObject {
             }
         }
     }
-
+    
     /// 遍历指定的相册
     ///
     /// - Parameters:
@@ -111,7 +111,7 @@ class QYPhotoSever: NSObject {
         }
         return assetModels
     }
-
+    
     /// 遍历相机胶卷中的数据
     ///
     /// - Parameters:
@@ -121,10 +121,10 @@ class QYPhotoSever: NSObject {
                                       block: @escaping (_: Array<QYGroup>) -> Void) {
         photoQueue.addOperation {
             let camerollAlbum: PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: self.getFetchOption(type: type))
-
+            
             var groups: [QYGroup] = Array<QYGroup>()
             camerollAlbum.enumerateObjects { obj, _, _ in
-
+                
                 if obj.assetCollectionSubtype == .smartAlbumUserLibrary {
                     let option = self.getFetchOption(type: type)
                     let assetModel: [QYAsset] = self.fetchCollection(collection: obj, option: option)
@@ -137,7 +137,7 @@ class QYPhotoSever: NSObject {
             }
         }
     }
-
+    
     /// 获取 资源原图
     ///
     /// - Parameters:
@@ -151,14 +151,14 @@ class QYPhotoSever: NSObject {
         options?.deliveryMode = .highQualityFormat
         options?.resizeMode = .exact
         options?.isNetworkAccessAllowed = true
-
+        
         options?.progressHandler = { pro, error, _, _ in
             progress?(pro, error)
         }
-
+        
         return requestOriginImage(option: options, asset: asset, completedHandler: completedHandler, progress: progress)
     }
-
+    
     /// 获取 资源原图
     ///
     /// - Parameters:
@@ -172,7 +172,7 @@ class QYPhotoSever: NSObject {
                                  completedHandler: QYPhotoSuccess?,
                                  progress _: QYPhotoProgress?) -> PHImageRequestID {
         return PHCachingImageManager.default().requestImageData(for: asset.phAsset!, options: option, resultHandler: { imageDate, _, _, info in
-
+            
             let finished: Bool = self.getFinishState(info!)
             if finished == true {
                 guard let completed: QYPhotoSuccess = completedHandler else {
@@ -183,10 +183,10 @@ class QYPhotoSever: NSObject {
                     completed(image)
                 }
             }
-
+            
         })
     }
-
+    
     /// 获取资源缩略图大小
     ///
     /// - Parameters:
@@ -204,7 +204,7 @@ class QYPhotoSever: NSObject {
                                 completedHandler: completedHandler,
                                 progress: progress)
     }
-
+    
     /// 获取资源的缩略图
     ///
     /// - Parameters:
@@ -222,14 +222,14 @@ class QYPhotoSever: NSObject {
         tmpOptions.progressHandler = { pro, error, _, _ in
             progress?(pro, error)
         }
-
+        
         return PHCachingImageManager.default().requestImage(for: asset.phAsset!, targetSize: size, contentMode: .aspectFill, options: tmpOptions, resultHandler: { image, _ in
-
+            
             guard let img: UIImage = image else {
                 print("error get thumbImage faild")
                 return
             }
-
+            
             guard let _: QYPhotoSuccess = completedHandler else {
                 print(" completedHandler is nil")
                 return
@@ -237,9 +237,9 @@ class QYPhotoSever: NSObject {
             completedHandler!(img)
         })
     }
-
+    
     // MARK: - 视频
-
+    
     /// 获取视频资源
     ///
     /// - Parameters:
@@ -258,7 +258,7 @@ class QYPhotoSever: NSObject {
             }
         }
         return requestVidoe(asset, options: videoOptions, finish: { url, error in
-
+            
             guard let outPutUrl: URL = url as URL! else {
                 self.runOnMainThread {
                     failure?(error)
@@ -270,7 +270,7 @@ class QYPhotoSever: NSObject {
             }
         })
     }
-
+    
     /// 获取视频资源
     ///
     /// - Parameters:
@@ -282,51 +282,51 @@ class QYPhotoSever: NSObject {
                               options: PHVideoRequestOptions,
                               finish: @escaping (_ url: URL?, _ error: Error?) -> Void)
         -> PHImageRequestID {
-        let imageManager: PHImageManager = PHImageManager.default()
-        let imageRequestId = imageManager.requestAVAsset(forVideo: asset.phAsset!, options: options) { asset, _, info in
-
-            if let icloudNum: NSNumber = info?[PHImageCancelledKey] as? NSNumber {
-                if icloudNum.boolValue == true {
-                    print("PHImageCancelledKey 对应的值为真时代表用户手动取消云端下载")
-                    return
-                }
-            }
-            switch asset {
-            case let urlAsset as AVURLAsset:
-                print("正常视频")
-                self.runOnMainThread {
-                    let url: URL = urlAsset.url
-                    finish(url, nil)
-                }
-            case let compositon as AVComposition:
-                print("慢动作视频")
-                let fileName = "mergeSlowMoVideo_" + "\(Int64(Date().timeIntervalSince1970))" + ".mov"
-
-                let filePath: String = NSHomeDirectory() + "/Documents/" + fileName
-                self.exportVideo(compositon, fileUrl: URL(string: filePath)!, completion: { outputPath, error in
-                    self.runOnMainThread {
-                        finish(outputPath, error)
+            let imageManager: PHImageManager = PHImageManager.default()
+            let imageRequestId = imageManager.requestAVAsset(forVideo: asset.phAsset!, options: options) { asset, _, info in
+                
+                if let icloudNum: NSNumber = info?[PHImageCancelledKey] as? NSNumber {
+                    if icloudNum.boolValue == true {
+                        print("PHImageCancelledKey 对应的值为真时代表用户手动取消云端下载")
+                        return
                     }
-
-                })
-
-            default: print("未知视频资源")
+                }
+                switch asset {
+                case let urlAsset as AVURLAsset:
+                    print("正常视频")
+                    self.runOnMainThread {
+                        let url: URL = urlAsset.url
+                        finish(url, nil)
+                    }
+                case let compositon as AVComposition:
+                    print("慢动作视频")
+                    let fileName = "mergeSlowMoVideo_" + "\(Int64(Date().timeIntervalSince1970))" + ".mov"
+                    
+                    let filePath: String = NSHomeDirectory() + "/Documents/" + fileName
+                    self.exportVideo(compositon, fileUrl: URL(string: filePath)!, completion: { outputPath, error in
+                        self.runOnMainThread {
+                            finish(outputPath, error)
+                        }
+                        
+                    })
+                    
+                default: print("未知视频资源")
+                }
             }
-        }
-        return imageRequestId
+            return imageRequestId
     }
-
+    
     /// 保存图片到 系统相册， gif使用该api只会保存一张静止的图片
     ///
     /// - Parameters:
     ///   - image: 图片对象
     ///   - completion: 完成回调
     open func saveImage(_ image: UIImage, completion: ((_ result: Bool, _ model: QYAsset?) -> Void)?) {
-        saveImage(image, completion: completion)
+        saveImage(image, customName: nil, completion: completion)
     }
-
+    
     // MARK: - 保存图片、视频
-
+    
     /// 保存图片到系统相册 gif使用该api只会保存一张静止的图片
     ///
     /// - Parameters:
@@ -336,10 +336,11 @@ class QYPhotoSever: NSObject {
     open func saveImage(_ image: UIImage,
                         customName: String?,
                         completion: ((_ result: Bool, _ model: QYAsset?) -> Void)?) {
-        let request: PHAssetChangeRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
-        saveAssetToAlbum(customAlbumName: customName, request: request, completion: completion)
+        saveAssetToAlbum(customAlbumName: customName, willPerformChange: { () -> PHAssetChangeRequest in
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }, completion: completion)
     }
-
+    
     /// 保存图片到相册，该api可以保存gif
     ///
     /// - Parameters:
@@ -347,22 +348,19 @@ class QYPhotoSever: NSObject {
     ///   - customAlbumName: 自定义相册
     ///   - completion: 完成回调
     open func saveImage(_ imagePath: String, customAlbumName: String?, completion: ((_ result: Bool, _ model: QYAsset?) -> Void)?) {
-        let request: PHAssetChangeRequest? = PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: URL(fileURLWithPath: imagePath))
-
-        guard let rq = request else {
-            runOnMainThread {
-                print("error PHAssetChangeRequest init failure")
-                if completion != nil {
-                    completion!(false, nil)
-                }
+        runOnMainThread {
+            print("error PHAssetChangeRequest init failure")
+            if completion != nil {
+                completion!(false, nil)
             }
-            return
         }
-        saveAssetToAlbum(customAlbumName: customAlbumName, request: rq, completion: completion)
+        saveAssetToAlbum(customAlbumName: customAlbumName, willPerformChange: { () -> PHAssetChangeRequest in
+            PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: URL(fileURLWithPath: imagePath))!
+        }, completion: completion)
     }
-
+    
     // MARK: - 保存视频
-
+    
     /// 保存视频到相册
     ///
     /// - Parameters:
@@ -370,47 +368,47 @@ class QYPhotoSever: NSObject {
     ///   - customAlbumName: 自定义相册
     ///   - completion: 完成回调
     open func saveVideo(_ videoPath: String, customAlbumName: String?, completion: ((_ result: Bool, _ model: QYAsset?) -> Void)?) {
-        let request: PHAssetChangeRequest? = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: videoPath))
-        guard let rq = request else {
-            runOnMainThread {
-                print("error PHAssetChangeRequest init failure")
-                if completion != nil {
-                    completion!(false, nil)
-                }
+        runOnMainThread {
+            print("error PHAssetChangeRequest init failure")
+            if completion != nil {
+                completion!(false, nil)
             }
-            return
         }
-        saveAssetToAlbum(customAlbumName: customAlbumName, request: rq, completion: completion)
+        saveAssetToAlbum(customAlbumName: customAlbumName, willPerformChange: { () -> PHAssetChangeRequest in
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: videoPath))!
+        }, completion: completion)
     }
-
+    
     // MARK: - 存相册公用模块
-
+    
     private func saveAssetToAlbum(customAlbumName: String?,
-                                  request: PHAssetChangeRequest,
+                                  willPerformChange: @escaping () -> PHAssetChangeRequest,
                                   completion: ((_ result: Bool, _ model: QYAsset?) -> Void)?) {
         func finishHandler(_ result: Bool = false, asset ast: PHAsset? = nil) {
             runOnMainThread {
                 if let _ = completion {
-                    let assetModel: QYAsset? = QYAsset(asset: ast!)
-                    completion!(result, assetModel)
+                    if result {
+                        
+                        let assetModel: QYAsset? = QYAsset(asset: ast!)
+                        completion!(result, assetModel)
+                    } else {
+                        completion!(result, nil)
+                    }
                 }
             }
         }
-
+        
         let status: PHAuthorizationStatus = QYPhotoSever.albumPermissonStatues()
         if status == .denied || status == .restricted {
             // 用户拒绝权限
             finishHandler()
         } else {
             saveAssetToAlbum(customName: customAlbumName,
-                             willPerformChange: { () -> PHAssetChangeRequest in
-
-                                 request
-                             },
+                             willPerformChange: willPerformChange,
                              completion: finishHandler)
         }
     }
-
+    
     private func saveAssetToAlbum(customName: String?,
                                   willPerformChange: @escaping () -> PHAssetChangeRequest,
                                   completion: @escaping (_ result: Bool, _ model: PHAsset?) -> Void) {
@@ -422,10 +420,11 @@ class QYPhotoSever: NSObject {
         photolibrary.performChanges({
             let changeRequest: PHAssetChangeRequest = willPerformChange()
             placeholderAsset = changeRequest.placeholderForCreatedAsset
-
-        }, completionHandler: { succ, Error in
-
+            
+        }, completionHandler: { succ, error in
+            
             if succ == false {
+                print("error = \(error!)")
                 finishHandler()
                 return
             }
@@ -448,15 +447,16 @@ class QYPhotoSever: NSObject {
             }
         })
     }
-
+    
     private func getAsset(identifier id: String) -> PHAsset? {
-        let result: PHFetchResult = PHAsset.fetchAssets(withBurstIdentifier: id, options: nil)
+        
+        let result = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
         if result.count > 0 {
             return result.firstObject
         }
         return nil
     }
-
+    
     private func getDestinationColletion(_ collectionName: String?) -> PHAssetCollection? {
         guard collectionName != nil else {
             return nil
@@ -484,9 +484,9 @@ class QYPhotoSever: NSObject {
         }
         return nil
     }
-
+    
     // MARK: - 删除相册元素
-
+    
     /// 删除相册中的元素
     ///
     /// - Parameters:
@@ -495,7 +495,7 @@ class QYPhotoSever: NSObject {
     open func deleMedailWithAsset(_ asset: QYAsset, completion: QYDeleteAssetCompletionBlock?) {
         deleMedailWithAsset(asset, customAlbumName: nil, completion: completion)
     }
-
+    
     /// 删除相册元素
     ///
     /// - Parameters:
@@ -515,7 +515,7 @@ class QYPhotoSever: NSObject {
         photoLibrary.performChanges({
             PHAssetChangeRequest.deleteAssets(asset.phAsset as! NSFastEnumeration)
         }, completionHandler: { succ, error in
-
+            
             if succ == true {
                 if customAlbumName != nil {
                     let desCollection = self.getDestinationColletion(customAlbumName)
@@ -523,14 +523,14 @@ class QYPhotoSever: NSObject {
                         photoLibrary.performChanges({
                             let request: PHAssetCollectionChangeRequest = PHAssetCollectionChangeRequest(for: desCollection!)!
                             request.removeAssets(asset.phAsset as! NSFastEnumeration)
-
+                            
                         }, completionHandler: { succ, error in
                             finishHanderl(success: succ, error: error)
                         })
                     } else {
                         finishHanderl()
                     }
-
+                    
                 } else {
                     finishHanderl(success: succ, error: error)
                 }
@@ -539,9 +539,9 @@ class QYPhotoSever: NSObject {
             }
         })
     }
-
+    
     // MARK: -取消云端下载
-
+    
     /// 取消云端下载
     ///
     /// - Parameter requsetId: 取消下载的 requestId
@@ -565,12 +565,12 @@ extension QYPhotoSever {
         let smartAlbums: PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil)
         //        我的照片流 1.6.10重新加入..
         let myPhotoStreamAlbum: PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumMyPhotoStream, options: nil)
-
+        
         let importAlbum: PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumSyncedAlbum, options: nil)
         //        let topLevelUserCollections:PHFetchResult = PHCollectionList.fetchTopLevelUserCollections(with: nil);
         return [smartAlbums, myPhotoStreamAlbum, importAlbum]
     }
-
+    
     private func getFetchOption(type: QYPhotoLibarayAssertType) -> PHFetchOptions {
         let options: PHFetchOptions = PHFetchOptions()
         switch type {
@@ -604,10 +604,10 @@ extension QYPhotoSever {
                 options.predicate = NSPredicate(format: "mediaType = %d", argumentArray: [PHAssetMediaType.image.rawValue])
             }
         }
-
+        
         return options
     }
-
+    
     private func defautRequestImageOption() -> PHImageRequestOptions {
         let options: PHImageRequestOptions = PHImageRequestOptions()
         options.resizeMode = .fast
@@ -615,7 +615,7 @@ extension QYPhotoSever {
         options.isSynchronous = false
         return options
     }
-
+    
     private func runOnMainThread(block: @escaping () -> Void) {
         if Thread.isMainThread {
             block()
@@ -625,12 +625,12 @@ extension QYPhotoSever {
             }
         }
     }
-
+    
     private func getFinishState(_ info: Dictionary<AnyHashable, Any>) -> Bool {
         var isCancel = false
         var isError = false
         var isDegraded = false
-
+        
         if let cancel: NSNumber = info[PHImageCancelledKey] as? NSNumber {
             isCancel = cancel.boolValue
         }
@@ -640,10 +640,10 @@ extension QYPhotoSever {
         if let degraded: NSNumber = info[PHImageResultIsDegradedKey] as? NSNumber {
             isDegraded = degraded.boolValue
         }
-
+        
         return !isCancel && !isError && !isDegraded
     }
-
+    
     /// 导出慢动作视频
     ///
     /// - Parameters:

@@ -9,8 +9,9 @@
 import UIKit
 
 class GroupListViewVC: UIViewController {
-    var groupArray: Array<QYGroup>? = Array<QYGroup>.init()
-
+    
+    private var groupArray: Array<QYGroup>? = Array<QYGroup>.init()
+    
     @IBOutlet var tableView: UITableView!
 
     override func viewDidLoad() {
