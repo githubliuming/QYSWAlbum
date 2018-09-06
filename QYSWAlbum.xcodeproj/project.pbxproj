@@ -341,7 +341,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = FJV2B9GPDW;
 				INFOPLIST_FILE = QYSWAlbum/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yoyoshijie.philm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -359,7 +359,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = FJV2B9GPDW;
 				INFOPLIST_FILE = QYSWAlbum/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yoyoshijie.philm;
 				PRODUCT_NAME = "$(TARGET_NAME)";

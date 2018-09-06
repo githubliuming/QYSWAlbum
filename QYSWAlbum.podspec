@@ -92,7 +92,7 @@ Pod::Spec.new do |s|
   #
 
   s.source_files  = "QYSWAlbum/Class/**/*.swift"
-  s.exclude_files = "QYSWAlbum/Exclude"
+  s.exclude_files = "QYSWAlbum/Class/Exclude"
 
   # s.public_header_files = "Classes/**/*.h"
 

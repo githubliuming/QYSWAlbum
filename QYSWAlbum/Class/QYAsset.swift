@@ -34,8 +34,10 @@ open class QYAsset: NSObject {
             }
             return QYPhotoAssetType.Video
         case .image:
-            if asset.mediaSubtypes == .photoLive || Int(asset.mediaSubtypes.rawValue) == 10 {
-                return QYPhotoAssetType.livePhoto
+            if #available(iOS 9.1, *) {
+                if asset.mediaSubtypes == .photoLive || Int(asset.mediaSubtypes.rawValue) == 10 {
+                    return QYPhotoAssetType.livePhoto
+                }
             }
             if (asset.value(forKey: "filename") as! String).hasSuffix("GIF") {
                 return QYPhotoAssetType.Gif

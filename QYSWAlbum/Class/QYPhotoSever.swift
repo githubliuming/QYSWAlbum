@@ -248,7 +248,7 @@ class QYPhotoSever: NSObject {
     ///   - failure: 导出失败回调
     ///   - progress: 进度回调
     /// - Returns: 前资源请求的 requestID
-    open func requestVideo(_ asset: QYAsset, success: QYVideoSucces?, failure: QYPhotoError?, progress: QYPhotoProgress?) -> PHLivePhotoRequestID {
+    open func requestVideo(_ asset: QYAsset, success: QYVideoSucces?, failure: QYPhotoError?, progress: QYPhotoProgress?) -> PHImageRequestID {
         let videoOptions: PHVideoRequestOptions = PHVideoRequestOptions()
         videoOptions.isNetworkAccessAllowed = true
         videoOptions.deliveryMode = .mediumQualityFormat
