@@ -8,7 +8,14 @@
 
 import Photos
 import UIKit
-open class QYAsset: NSObject {
+open class QYAsset: NSObject,NSCopying {
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let theObj = QYAsset.init(asset: phAsset)
+        return theObj
+    }
+    open override func mutableCopy() -> Any {
+        return self.copy()
+    }
     public var phAsset: PHAsset?
     public var medaiType: QYPhotoAssetType = .Unknown
     public init(asset: PHAsset?) {
@@ -16,11 +23,11 @@ open class QYAsset: NSObject {
         phAsset = asset
         medaiType = transformAssetType(asset: asset)
     }
-
+    
     public required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private func transformAssetType(asset ast: PHAsset?) -> QYPhotoAssetType {
         guard let asset: PHAsset = ast else {
             return QYPhotoAssetType.Unknown
